@@ -13,6 +13,16 @@ app.use(express.static(__dirname, {
   extensions: ['html', 'htm']
 }));
 
+// Fallback static handler: if a requested path matches an existing file with an extension, send it
+app.get('*.*', (req, res, next) => {
+  const resolved = path.join(__dirname, decodeURIComponent(req.path));
+  res.sendFile(resolved, (err) => {
+    if (err) {
+      next();
+    }
+  });
+});
+
 // Redirect removed legacy routes to home
 app.get(['/global-review*', '/it-solutions*', '/online-courses*'], (req, res) => {
   res.redirect(301, '/');
